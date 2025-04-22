@@ -11,4 +11,4 @@ Matthew Love
 Rivers Haley
 > The cool guy
 
-![Don't click](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+[Don't click](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
