@@ -6,47 +6,6 @@ import "./App.css";
 function App() {
   const [count, setCount] = useState(0);
 
-  const [intLastReportedTime, setIntLastReportedTime] = useState(0);
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    if (videoElement) {
-      // Prevent pausing
-      videoElement.onpause = () => {
-        videoElement.play();
-      };
-
-      // Prevent seeking
-      videoElement.onseeked = () => {
-        videoElement.currentTime = intLastReportedTime;
-      };
-
-      // Prevent playback rate changes
-      videoElement.onratechange = () => {
-        videoElement.playbackRate = 1.0;
-      };
-
-      // Ensure the video starts playing immediately
-      videoElement.play();
-      videoElement.playbackRate = 1.0;
-    }
-  }, [videoRef, intLastReportedTime]);
-
-  // Update the last reported time every second
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    if (videoElement) {
-      const handleTimeUpdate = () => {
-        setIntLastReportedTime(videoElement.currentTime);
-      };
-      videoElement.addEventListener("timeupdate", handleTimeUpdate);
-      return () => {
-        videoElement.removeEventListener("timeupdate", handleTimeUpdate);
-      };
-    }
-  }, [videoRef]);
-
   return (
     <>
       <div>
@@ -68,13 +27,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
       <div>
-        <video
-          height="500"
-          src="http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_h264.mov"
-          autoPlay
-        >
-          <p>I'm not Catholic, but welcome to Purgatory</p>
-        </video>
+        <ForcedVideo videoUrl="http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_h264.mov" />
         <p style={{ fontSize: "9px", textAlign: "center" }}>
           This project was developed by Matthew Love (mtlove42), Rivers Haley
           (jrhaley42), and Chase Gibbs (cdgibbs42).
@@ -85,3 +38,59 @@ function App() {
 }
 
 export default App;
+
+function ForcedVideo({ videoUrl }: { videoUrl: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Auto-play
+    video.play().catch(console.error);
+
+    // Prevent pause
+    const blockPause = () => video.play();
+    video.addEventListener("pause", blockPause);
+
+    // Prevent seeking
+    const blockSeek = () => {
+      if (Math.abs(video.currentTime - lastTimeRef.current) > 0.1) {
+        video.currentTime = lastTimeRef.current;
+      }
+    };
+    const lastTimeRef = { current: 0 };
+    const trackTime = () => {
+      lastTimeRef.current = video.currentTime;
+    };
+
+    video.addEventListener("timeupdate", trackTime);
+    video.addEventListener("seeking", blockSeek);
+
+    // Lock playback rate
+    video.playbackRate = 1.0;
+    const blockPlaybackRateChange = () => {
+      if (video.playbackRate !== 1.0) video.playbackRate = 1.0;
+    };
+    video.addEventListener("ratechange", blockPlaybackRateChange);
+
+    return () => {
+      video.removeEventListener("pause", blockPause);
+      video.removeEventListener("timeupdate", trackTime);
+      video.removeEventListener("seeking", blockSeek);
+      video.removeEventListener("ratechange", blockPlaybackRateChange);
+    };
+  }, []);
+
+  return (
+    <video
+      ref={videoRef}
+      src={videoUrl}
+      controls
+      autoPlay
+      muted
+      loop
+      style={{ width: "100%" }}
+    />
+  );
+}
