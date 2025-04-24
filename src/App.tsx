@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
@@ -7,28 +7,45 @@ function App() {
   const [count, setCount] = useState(0);
 
   const [intLastReportedTime, setIntLastReportedTime] = useState(0);
-  const videoElement = document.querySelector("video");
 
-  if (videoElement) {
-    videoElement.addEventListener("pause", () => {
-      videoElement.play();
-    });
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      // Prevent pausing
+      videoElement.onpause = () => {
+        videoElement.play();
+      };
 
-    videoElement.addEventListener("ratechange", () => {
-      videoElement.playbackRate = 1.0;
-    });
-
-    videoElement.addEventListener("timeupdate", () => {
-      if (
-        videoElement.currentTime < intLastReportedTime ||
-        videoElement.currentTime > intLastReportedTime + 1
-      ) {
+      // Prevent seeking
+      videoElement.onseeked = () => {
         videoElement.currentTime = intLastReportedTime;
-      }
-      console.log(videoElement.currentTime);
-      setIntLastReportedTime(videoElement.currentTime);
-    });
-  }
+      };
+
+      // Prevent playback rate changes
+      videoElement.onratechange = () => {
+        videoElement.playbackRate = 1.0;
+      };
+
+      // Ensure the video starts playing immediately
+      videoElement.play();
+      videoElement.playbackRate = 1.0;
+    }
+  }, [videoRef, intLastReportedTime]);
+
+  // Update the last reported time every second
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      const handleTimeUpdate = () => {
+        setIntLastReportedTime(videoElement.currentTime);
+      };
+      videoElement.addEventListener("timeupdate", handleTimeUpdate);
+      return () => {
+        videoElement.removeEventListener("timeupdate", handleTimeUpdate);
+      };
+    }
+  }, [videoRef]);
 
   return (
     <>
