@@ -88,7 +88,6 @@ function ForcedVideo({ videoUrl }: { videoUrl: string }) {
       controls
       autoPlay
       muted
-      loop
       style={{ width: "100%" }}
     />
   );
