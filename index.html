@@ -5,8 +5,27 @@
 <title>CSC2400 Extra Credit Project</title>
 </head>
 <body>
+    <video height="500" src="http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_h264.mov" autoplay>
+        <p>I'm not Catholic, but welcome to Purgatory</p>
+    </video>
     <p style="font-size: 9px; text-align: center;">
         This project was developed by Matthew Love (mtlove42), Rivers Haley (jrhaley42), and Chase Gibbs (cdgibbs42).
     </p>
+    <script>
+        intLastReportedTime = 0
+        document.querySelector('video').addEventListener('pause', function() {
+            document.querySelector('video').play()
+        })
+        document.querySelector('video').addEventListener('ratechange', function() {
+            document.querySelector('video').playbackRate = 1.0
+        })
+        document.querySelector('video').addEventListener('timeupdate', function() {
+            console.log(document.querySelector('video').currentTime)
+            if(document.querySelector('video').currentTime < intLastReportedTime || document.querySelector('video').currentTime > intLastReportedTime + 1) {
+                document.querySelector('video').currentTime = intLastReportedTime
+            }
+            intLastReportedTime = document.querySelector('video').currentTime
+        })
+    </script>
 </body>
 </html>
