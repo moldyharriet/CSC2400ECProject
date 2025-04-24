@@ -15,10 +15,13 @@ Rivers Haley
 
 # Setup
 
-- Install Node
-- Install npm (Node package manager)
-- Run the following
-- cd CSC2400ECProject
+- Install Node.js and npm (Node package manager)
+  - Go to the official website: https://nodejs.org
+  - Click the LTS (Long Term Support) version (recommended).
+  - Run the installer and follow the prompts.
+  - After installation, confirm it's working. Run these in your terminal: `node -v`, `npm -v`
+  - 
+- Go to our project. cd CSC2400ECProject
 - `npm i`
 - `npm run dev`
 - Paste the localhost address into your browser
