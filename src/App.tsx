@@ -50,9 +50,6 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-      <head>
-        <title>CSC2400 Extra Credit Project</title>
-      </head>
       <div>
         <video
           height="500"
