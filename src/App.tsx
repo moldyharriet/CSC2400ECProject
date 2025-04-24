@@ -27,7 +27,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
       <div>
-        <ForcedVideo videoUrl="http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_h264.mov" />
+        <ForcedVideo videoUrl="http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_480p_h264.mov" />
         <p style={{ fontSize: "9px", textAlign: "center" }}>
           This project was developed by Matthew Love (mtlove42), Rivers Haley
           (jrhaley42), and Chase Gibbs (cdgibbs42).
@@ -55,16 +55,15 @@ function ForcedVideo({ videoUrl }: { videoUrl: string }) {
 
     // Prevent seeking
     const blockSeek = () => {
-      if (Math.abs(video.currentTime - lastTimeRef.current) > 0.1) {
+      if (Math.abs(video.currentTime - lastTimeRef.current) > 1) {
         video.currentTime = lastTimeRef.current;
+      } else {
+        lastTimeRef.current = video.currentTime;
       }
     };
-    const lastTimeRef = { current: 0 };
-    const trackTime = () => {
-      lastTimeRef.current = video.currentTime;
-    };
+    const lastTimeRef = { current: 0.0 };
 
-    video.addEventListener("timeupdate", trackTime);
+    video.addEventListener("timeupdate", blockSeek);
     video.addEventListener("seeking", blockSeek);
 
     // Lock playback rate
@@ -76,7 +75,7 @@ function ForcedVideo({ videoUrl }: { videoUrl: string }) {
 
     return () => {
       video.removeEventListener("pause", blockPause);
-      video.removeEventListener("timeupdate", trackTime);
+      video.addEventListener("timeupdate", blockSeek);
       video.removeEventListener("seeking", blockSeek);
       video.removeEventListener("ratechange", blockPlaybackRateChange);
     };
