@@ -1,33 +1,26 @@
 import { useEffect, useRef, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [inputValue, setInputValue] = useState<number[]>([]);
+
+  const callFormatArray = (input: string) => {
+    formatArray(input, setInputValue);
+  };
 
   return (
     <>
+      {/*
+          Array visualization goes below (such that it's above the video)
+      */}
+
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h1>Quicksort Algorithm Visualizer</h1>
+        <ArrayInput onSubmit={callFormatArray}/>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>Chase is cool</p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
       <div>
-        <ForcedVideo videoUrl="http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_480p_h264.mov" />
+        <ForcedVideo videoUrl="https://www.youtube.com/embed/AidAXgq9dWc?si=jIhXpaWZIwbSkeHW&amp&autoplay=1&mute=1&controls=0" />
         <p style={{ fontSize: "9px", textAlign: "center" }}>
           This project was developed by Matthew Love (mtlove42), Rivers Haley
           (jrhaley42), and Chase Gibbs (cdgibbs42).
@@ -82,13 +75,59 @@ function ForcedVideo({ videoUrl }: { videoUrl: string }) {
   }, []);
 
   return (
-    <video
-      ref={videoRef}
-      src={videoUrl}
-      controls
-      autoPlay
-      muted
-      style={{ width: "100%" }}
-    />
+    <div style={{ width: "100%", position: "relative", paddingBottom: "56.25%" }}>
+      <iframe
+        src={videoUrl}
+        title="YouTube video player"
+        frameBorder="0"   // deprecated but still functions, don't remove
+        allowFullScreen
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+        }}
+      ></iframe>
+    </div>
+  );
+}
+
+function formatArray(inputArray: string, setInputValue: (value: number[]) => void){
+  try {
+    // Remove curly braces if present and split by commas
+    const cleanedInput = inputArray.replace(/[{}]/g, "").trim();
+    const parsedArray = cleanedInput
+      .split(",")                               // Split by commas
+      .map((num) => parseFloat(num.trim()))     // Convert to numbers
+      .filter((num) => !isNaN(num));            // Filter out invalid numbers
+
+    setInputValue(parsedArray);                 // Update the state in App
+    console.log("Parsed Array:", parsedArray);  // For debugging
+  } catch (error) {
+    console.error("Invalid input format:", error);
+  }
+}
+
+function ArrayInput({ onSubmit }: { onSubmit: (input: string) => void }) {
+  const [inputValue, setInputValue] = useState("");
+
+  const handleSubmit = () => {
+    onSubmit(inputValue); // Pass the input value to the formatArray function
+    setInputValue(""); // Clear the input box
+  };
+
+  return (
+    <>
+      <input
+        placeholder="Enter Array Data Here (e.g. {1, 2, 3, 4})"
+        style={{ width: "237px" }}
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)} // Update state on input change
+      /><br/><br/>
+      <button className="submitUserArray" onClick={handleSubmit}>
+        Submit
+      </button>
+    </>
   );
 }
